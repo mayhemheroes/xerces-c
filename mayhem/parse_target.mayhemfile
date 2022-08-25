@@ -1,0 +1,4 @@
+project: PROJECT
+target: parse_target
+cmds:
+- cmd: /out/parse_target
