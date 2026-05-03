@@ -28,6 +28,8 @@ $CXX $CXXFLAGS $LIB_FUZZING_ENGINE -std=c++17 \
 if [[ $CFLAGS != *sanitize=memory* ]]; then
 	rm -rf genfiles && mkdir genfiles && LPM/external.protobuf/bin/protoc xml.proto --cpp_out=genfiles
 
+	ABSL_LIBS=$(ls LPM/external.protobuf/lib/libabsl_*.a LPM/external.protobuf/lib/libutf8_*.a 2>/dev/null | tr '\n' ' ')
+
 	$CXX $CXXFLAGS $LIB_FUZZING_ENGINE -DNDEBUG -std=c++17 \
 	        -I. -I xerces-c/src -Ixerces-c/build/src genfiles/xml.pb.cc xmlProtoConverter.cpp xerces_fuzz_common.cpp parse_target_proto.cpp \
 	        -I libprotobuf-mutator/ \
@@ -36,5 +38,6 @@ if [[ $CFLAGS != *sanitize=memory* ]]; then
 	        -o $OUT/parse_target_proto xerces-c/src/.libs/libxerces-c.a \
 	        LPM/src/libfuzzer/libprotobuf-mutator-libfuzzer.a \
 	        LPM/src/libprotobuf-mutator.a \
-	        LPM/external.protobuf/lib/libprotobuf.a
+	        LPM/external.protobuf/lib/libprotobuf.a \
+	        -Wl,--start-group $ABSL_LIBS -Wl,--end-group
 fi
